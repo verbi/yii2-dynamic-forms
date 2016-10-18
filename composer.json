@@ -1,0 +1,25 @@
+{
+	"name": "verbi/yii2-dynamic-forms",
+	"description": "Yii2 Dynamic Forms Extension.",
+	"keywords": ["yii2", "extension", "forms"],
+	"type": "yii2-extension",
+	"license": "New BSD License",
+	"authors": [
+		{
+			"name": "Philip Verbist",
+			"email": "philip.verbist@gmail.com"
+		}
+	],
+	"support": {
+		"source": "http://gitlab.verbi.eu/verbi/yii2-dynamic-forms"
+	},
+        "require": {
+            "kartik-v/yii2-builder": "dev-master",
+            "verbi/yii2-web-controller": "*"
+        },
+	"autoload": {
+		"psr-4": {
+			"verbi\\yii2DynamicForms\\": "src/"
+		}
+	}
+}
