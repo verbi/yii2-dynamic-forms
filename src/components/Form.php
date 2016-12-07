@@ -12,6 +12,7 @@ use verbi\yii2Helpers\Html;
  * @license https://opensource.org/licenses/GPL-3.0
 */
 class Form extends \kartik\builder\Form {
+    use \verbi\yii2Helpers\traits\WidgetTrait;
     public static function getOptions($options = []) {
         $formOptions = [
             'columns' => 2,
@@ -57,7 +58,9 @@ class Form extends \kartik\builder\Form {
         if (property_exists($item, 'modelClass')) {
             $modelClass = $item->modelClass;
             $model = new $modelClass;
-            $attributes = $model->getAttributesForForm();
+            if($model->hasMethod('getAttributesForForm')) {
+                $attributes = $model->getAttributesForForm();
+            }
         } elseif (property_exists($item, 'from') && $item->from) {
             foreach ($items->from as $tablename) {
                 
