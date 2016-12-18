@@ -89,7 +89,7 @@ class Form extends \kartik\builder\Form {
                         $options2['attributes'] = static::getAttributesForForm($item->query);
                     }
                 }
-                if ($item instanceof \yii\base\Model) {
+                elseif ($item instanceof \yii\base\Model) {
                     $options2['model'] = $item;
                     $options2['attributes'] = $options2['model']->getAttributesForForm();
                     $label = null;
