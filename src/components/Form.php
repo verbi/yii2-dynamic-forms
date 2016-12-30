@@ -28,10 +28,9 @@ class Form extends \kartik\builder\Form {
     public static function widget($options = []) {
         $formOptions = [];
         if (isset($options['formOptions'])) {
-            $formOptions = $options['formOptions'];
+            $formOptions = array_merge($formOptions, $options['formOptions']);
             unset($options['formOptions']);
         }
-       
         ob_start();
         ob_implicit_flush(false);
         $formRendered = false;
@@ -40,22 +39,32 @@ class Form extends \kartik\builder\Form {
             $options['form'] = $form;
             $formRendered = true;
         }
-        $output = static::getFormWidgets(static::getOptions($options));
+        $options = static::getOptions($options);
+        $output = static::getFormWidgets($options);
         echo $output;
-        echo Html::resetButton('Reset', ['class' => 'btn btn-default']);
-        echo Html::submitButton('Submit', ['class' => 'btn btn-primary']);
-        
+        echo static::getFormButtons($options);
         if($formRendered) {
             ActiveForm::end();
         }
-        echo static::getTabularModals(static::getOptions($options));
-
+        echo static::getTabularModals($options);
         return ob_get_clean();
+    }
+    
+    protected static function getFormButtons(&$options = []) {
+        return Html::resetButton('Reset', ['class' => 'btn btn-default']) 
+                . Html::submitButton('Submit', ['class' => 'btn btn-primary']);
     }
 
     protected static function getAttributesForForm($item) {
         $attributes = [];
-        if (property_exists($item, 'modelClass')) {
+        if($item instanceof \yii\base\model) {
+            if($item->hasMethod('getAttributesForForm')) {
+                $attributes = $item->getAttributesForForm();
+            }
+            else {
+                $attributes = $item->attributes();
+            }
+        } elseif (property_exists($item, 'modelClass')) {
             $modelClass = $item->modelClass;
             $model = new $modelClass;
             if($model->hasMethod('getAttributesForForm')) {
@@ -69,11 +78,11 @@ class Form extends \kartik\builder\Form {
         return $attributes;
     }
 
-    public static function getFormWidgets($options = []) {
+    public static function getFormWidgets(&$options = []) {
         $output = '';
         $output2 = '';
-         if (isset($options['model'])) {
-            $options['attributes'] = $options['model']->getAttributesForForm();
+        if (isset($options['model'])) {
+            $options['attributes'] = static::getAttributesForForm($options['model']);
             $output .= \verbi\yii2Helpers\widgets\builder\Form::widget($options);
         }
         if (isset($options['items']) && is_array($options['items'])) {
@@ -81,7 +90,6 @@ class Form extends \kartik\builder\Form {
                 $options2 = $options;
                 unset($options2['items']);
                 if ($item instanceof \yii\db\Query) {
-
                     $item = new \yii\data\ActiveDataProvider([
                         'query' => $item,
                     ]);
@@ -113,36 +121,6 @@ class Form extends \kartik\builder\Form {
                                 Html::submitButton('<i class="glyphicon glyphicon-floppy-disk"></i> ' . \Yii::t('verbi', 'Save'), ['class' => 'btn btn-primary']);
                     }
                     $output.=TabularForm::widget($options2);
-
-                    ob_start();
-                    ob_implicit_flush(false);
-
-                    \yii\bootstrap\Modal::begin([
-                        'header' => '<h2>Hello world</h2>',
-                        'toggleButton' => ['label' => '<i class="glyphicon glyphicon-plus"></i> ' . \Yii::t('verbi', 'Add New'), 'class' => 'btn btn-success'],
-                    ]);
-
-                    echo '1Say hello...';
-
-                    \yii\bootstrap\Modal::end();
-                    \yii\bootstrap\Modal::begin([
-                        'header' => '<h2>Hello world</h2>',
-                        'toggleButton' => ['label' => '<i class="glyphicon glyphicon-plus"></i> ' . \Yii::t('verbi', 'Add New'), 'class' => 'btn btn-success'],
-                    ]);
-
-                    echo '2Say hello...';
-
-                    \yii\bootstrap\Modal::end();
-                    \yii\bootstrap\Modal::begin([
-                        'header' => '<h2>Hello world</h2>',
-                        'toggleButton' => ['label' => '<i class="glyphicon glyphicon-plus"></i> ' . \Yii::t('verbi', 'Add New'), 'class' => 'btn btn-success'],
-                    ]);
-
-                    echo '3Say hello...';
-
-                    \yii\bootstrap\Modal::end();
-
-                    $output2 .= ob_get_clean();
                 }
             }
         }
@@ -155,7 +133,7 @@ class Form extends \kartik\builder\Form {
         return Form::widget($options);
     }
 
-    protected static function getTabularModals($options) {
+    protected static function getTabularModals(&$options) {
         ob_start();
         ob_implicit_flush(false);
         if(isset($options['items'])) {
