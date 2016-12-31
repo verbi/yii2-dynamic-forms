@@ -15,7 +15,7 @@
 	},
         "require": {
             "kartik-v/yii2-builder": "dev-master",
-            "verbi/yii2-web-controller": "*"
+            "verbi/yii2-web-controller": ">=1.2.0"
         },
 	"autoload": {
 		"psr-4": {
