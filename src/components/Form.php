@@ -80,7 +80,6 @@ class Form extends \kartik\builder\Form {
 
     public static function getFormWidgets(&$options = []) {
         $output = '';
-        $output2 = '';
         if (isset($options['model'])) {
             $options['attributes'] = static::getAttributesForForm($options['model']);
             $output .= \verbi\yii2Helpers\widgets\builder\Form::widget($options);
@@ -107,7 +106,12 @@ class Form extends \kartik\builder\Form {
                     } elseif (method_exists($options2['model'], 'label')) {
                         $label = $options2['model']->label();
                     }
-                    $output .= Html::fieldset(\verbi\yii2Helpers\widgets\builder::widget($options2), ['legend' => $label]);
+                    if($label) {
+                        $output .= Html::fieldset(\verbi\yii2Helpers\widgets\builder::widget($options2), ['legend' => $label]);
+                    }
+                    else {
+                        $output .= \verbi\yii2Helpers\widgets\builder::widget($options2);
+                    }
                 } elseif ($item instanceof \yii\data\BaseDataProvider) {
                     $options2['dataProvider'] = $item;
                     if (!isset($options2['attributes'])) {
